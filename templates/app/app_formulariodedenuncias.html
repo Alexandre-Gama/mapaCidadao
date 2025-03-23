@@ -1,0 +1,138 @@
+<!-- filepath: /I:/CodeProjects/mapaCidadao/templates/app/app_formulariodedenuncias.html -->
+{% extends 'base.html' %}
+
+{% block title %}Registrar Denúncia - Mapa Cidadão{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <h2 class="mb-4">Registrar Nova Denúncia</h2>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="id_descricao" class="form-label">Descrição do problema</label>
+                {{ form.descricao }}
+                <div class="form-text">Descreva o problema encontrado de forma clara e objetiva.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="id_tipo_problema" class="form-label">Tipo de Problema</label>
+                {{ form.tipo_problema }}
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Localização</label>
+                <div class="d-grid gap-2 mb-2">
+                    <button type="button" id="btn-usar-minha-localizacao" class="btn btn-secondary">
+                        <i class="fas fa-location-arrow"></i> Usar minha localização atual
+                    </button>
+                </div>
+                <div id="map" style="height: 400px;" class="border rounded"></div>
+                <div class="form-text mt-2">Clique no mapa para ajustar a localização exata do problema ou use o botão acima para usar sua localização atual.</div>
+                {{ form.latitude }}
+                {{ form.longitude }}
+            </div>
+            
+            <div class="mb-4">
+                <h5>Anexo</h5>
+                <div class="form-text mb-2">Adicione uma foto ou documento que evidencie o problema relatado.</div>
+                {{ formset.management_form }}
+                <div id="anexos-container">
+                    {% for anexo_form in formset %}
+                        <div class="anexo-item mb-2">
+                            {{ anexo_form.arquivo }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Enviar Denúncia</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar mapa
+        var map = L.map('map').setView([-23.550520, -46.633309], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        var marker = null;
+        
+        // Solicitar localização automaticamente ao carregar a página
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+                
+                // Centralizar o mapa
+                map.setView([latitude, longitude], 17);
+                
+                // Adicionar marcador
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                marker = L.marker([latitude, longitude]).addTo(map);
+                
+                // Atualizar campos hidden
+                document.getElementById('id_latitude').value = latitude;
+                document.getElementById('id_longitude').value = longitude;
+                
+            }, function(error) {
+                console.error("Erro ao obter localização:", error);
+            });
+        } else {
+            console.log("Geolocalização não disponível");
+        }
+        
+        // Adicionar marcador ao clicar no mapa
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker(e.latlng).addTo(map);
+            
+            // Atualizar campos de latitude e longitude
+            document.getElementById('id_latitude').value = e.latlng.lat;
+            document.getElementById('id_longitude').value = e.latlng.lng;
+        });
+        
+        // Botão para usar localização atual
+        document.getElementById('btn-usar-minha-localizacao').addEventListener('click', function() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    
+                    // Centralizar o mapa
+                    map.setView([latitude, longitude], 17);
+                    
+                    // Adicionar marcador
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker([latitude, longitude]).addTo(map);
+                    
+                    // Atualizar campos hidden
+                    document.getElementById('id_latitude').value = latitude;
+                    document.getElementById('id_longitude').value = longitude;
+                    
+                }, function(error) {
+                    console.error("Erro ao obter localização:", error);
+                    alert("Não foi possível obter sua localização. Por favor, clique no mapa para indicar a posição.");
+                });
+            } else {
+                alert("Seu navegador não suporta geolocalização. Por favor, clique no mapa para indicar a posição.");
+            }
+        });
+    });
+</script>
+{% endblock %}

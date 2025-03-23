@@ -1,0 +1,33 @@
+<!-- filepath: /I:/CodeProjects/mapaCidadao/templates/app/detalhe_denuncia.html -->
+<div class="detail-content">
+    <h4>{{ denuncia.descricao }}</h4>
+    <p><strong>Tipo de problema:</strong> {{ denuncia.tipo_problema.descricao }}</p>
+    <p><strong>Data e hora:</strong> {{ denuncia.data_hora|date:"d/m/Y H:i" }}</p>
+    <p><strong>Visualizações:</strong> {{ estatistica.visualizacoes }}</p>
+
+    {% if anexos %}
+        <h5 class="mt-4">Anexos</h5>
+        <div class="row">
+            {% for anexo in anexos %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        {% with url_lower=anexo.arquivo.url|lower %}
+                            {% if '.jpg' in url_lower or '.jpeg' in url_lower or '.png' in url_lower or '.gif' in url_lower %}
+                                <img src="{{ anexo.arquivo.url }}" class="card-img-top img-fluid" alt="Anexo">
+                            {% else %}
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file fa-3x"></i>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        <div class="card-footer">
+                            <a href="{{ anexo.arquivo.url }}" target="_blank" class="btn btn-sm btn-primary w-100">Ver anexo</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">Nenhum anexo disponível para esta denúncia.</p>
+    {% endif %}
+</div>

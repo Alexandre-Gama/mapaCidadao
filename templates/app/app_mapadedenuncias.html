@@ -1,0 +1,181 @@
+<!-- filepath: /I:/CodeProjects/mapaCidadao/templates/app/app_mapadedenuncias.html -->
+{% extends 'base.html' %}
+
+{% block title %}Mapa de Denúncias - Mapa Cidadão{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">Filtros</div>
+            <div class="card-body">
+                <form id="filtro-form">
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Problema</label>
+                        <select id="filtro-tipo" class="form-select">
+                            <option value="">Todos</option>
+                            {% for tipo in tipos_problema %}
+                                <option value="{{ tipo.id }}">{{ tipo.descricao }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" id="filtro-data-inicio" class="form-control">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" id="filtro-data-fim" class="form-control">
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">Estatísticas</div>
+            <div class="card-body">
+                <p><strong>Total de denúncias:</strong> <span id="total-denuncias">0</span></p>
+                <p><strong>Visualizando:</strong> <span id="visualizando-denuncias">0</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <h2 class="mb-3">Mapa de Denúncias</h2>
+        <div id="mapa-denuncias" style="height: 600px;" class="border rounded"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="detalheModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes da Denúncia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalhe-conteudo">
+                <!-- Conteúdo preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar mapa
+        var map = L.map('mapa-denuncias').setView([-23.550520, -46.633309], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Variáveis globais
+        var markers = [];
+        var detalheModal = new bootstrap.Modal(document.getElementById('detalheModal'));
+        
+        // Cores para os tipos de problemas
+        var cores = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF5', '#F5FF33'];
+        
+        // Solicitar localização do usuário
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                map.setView([position.coords.latitude, position.coords.longitude], 15);
+                carregarDenuncias();
+            }, function(error) {
+                console.error("Erro ao obter localização:", error);
+                carregarDenuncias();
+            });
+        } else {
+            console.log("Geolocalização não disponível");
+            carregarDenuncias();
+        }
+        
+        // Função para carregar denúncias
+        function carregarDenuncias() {
+            // Limpar marcadores existentes
+            markers.forEach(function(marker) {
+                map.removeLayer(marker);
+            });
+            markers = [];
+            
+            // Construir URL com filtros - corrigida para incluir o prefixo /mapa/
+            var url = '/mapa/api/denuncias/?';
+            var tipo = document.getElementById('filtro-tipo').value;
+            var dataInicio = document.getElementById('filtro-data-inicio').value;
+            var dataFim = document.getElementById('filtro-data-fim').value;
+            
+            if (tipo) url += 'tipo=' + tipo + '&';
+            if (dataInicio) url += 'data_inicio=' + dataInicio + '&';
+            if (dataFim) url += 'data_fim=' + dataFim + '&';
+            
+            // Fazer requisição AJAX
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Atualizar estatísticas
+                    document.getElementById('total-denuncias').textContent = data.denuncias.length;
+                    document.getElementById('visualizando-denuncias').textContent = data.denuncias.length;
+                    
+                    // Adicionar marcadores
+                    data.denuncias.forEach(function(denuncia) {
+                        var corIndex = denuncia.tipo_problema_id % cores.length;
+                        var icone = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: `<div style="background-color: ${cores[corIndex]};" class="marker-pin"></div>`,
+                            iconSize: [30, 42],
+                            iconAnchor: [15, 42]
+                        });
+                        
+                        var marker = L.marker([denuncia.latitude, denuncia.longitude], {icon: icone}).addTo(map);
+                        marker.bindPopup(`
+                            <strong>${denuncia.descricao}</strong><br>
+                            Tipo: ${denuncia.tipo_problema}<br>
+                            Data: ${denuncia.data_hora}<br>
+                            <a href="#" onclick="abrirDetalhes(${denuncia.id}); return false;">Ver detalhes</a>
+                        `);
+                        
+                        markers.push(marker);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar denúncias:', error));
+        }
+        
+        // Função para abrir detalhes
+        window.abrirDetalhes = function(id) {
+            fetch('/mapa/denuncia/' + id + '/')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('detalhe-conteudo').innerHTML = html;
+                    detalheModal.show();
+                });
+        }
+        
+        // Event listeners
+        document.getElementById('filtro-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            carregarDenuncias();
+        });
+    });
+</script>
+
+<style>
+    .marker-pin {
+        width: 30px;
+        height: 30px;
+        border-radius: 50% 50% 50% 0;
+        background: #c30b82;
+        position: absolute;
+        transform: rotate(-45deg);
+        left: 50%;
+        top: 50%;
+        margin: -15px 0 0 -15px;
+    }
+</style>
+{% endblock %}

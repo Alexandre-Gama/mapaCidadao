@@ -1,0 +1,71 @@
+<!-- filepath: /I:/CodeProjects/mapaCidadao/templates/app/pagina_inicial.html -->
+{% extends 'base.html' %}
+
+{% block title %}Mapa Cidadão - Registro e Visualização de Denúncias{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">Mapa Cidadão</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+            Uma plataforma para registro e visualização de denúncias relacionadas a problemas urbanos.
+            Ajude a melhorar sua cidade reportando problemas e acompanhando a sua resolução.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'formulario_denuncia' %}" class="btn btn-primary btn-lg px-4 gap-3">Registrar Denúncia</a>
+            <a href="{% url 'mapa_denuncias' %}" class="btn btn-outline-secondary btn-lg px-4">Explorar Mapa</a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Denúncias Registradas</h5>
+                    <h2 class="card-text my-3">{{ total_denuncias }}</h2>
+                    <p class="text-muted">Total de problemas reportados</p>
+                    <a href="{% url 'mapa_denuncias' %}" class="btn btn-sm btn-outline-primary">Ver no mapa</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Tipos de Problemas</h5>
+                    <ul class="list-group list-group-flush my-3">
+                        {% for tipo in tipos_problema|slice:":5" %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ tipo.descricao }}
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ tipo.denuncia_set.count }}
+                                </span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Nenhum tipo de problema cadastrado</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'formulario_denuncia' %}" class="btn btn-sm btn-outline-primary">Registrar denúncia</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Como Funciona</h5>
+                    <ol class="my-3">
+                        <li>Registre sua denúncia com detalhes e localização</li>
+                        <li>Adicione anexos como fotos do problema</li>
+                        <li>Visualize todas as denúncias no mapa</li>
+                        <li>Acompanhe estatísticas e detalhes</li>
+                    </ol>
+                    <div class="d-grid">
+                        <a href="{% url 'formulario_denuncia' %}" class="btn btn-primary">Começar agora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
