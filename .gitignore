@@ -27,9 +27,3 @@ mapacidadao_env/
 
 # Collected static files
 staticfiles/
-
-# Anexos
-anexos/
-
-# Django Settings
-MapaCidadaoProject/settings.py
