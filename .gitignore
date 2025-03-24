@@ -30,3 +30,6 @@ staticfiles/
 
 # Anexos
 anexos/
+
+# Django Settings
+MapaCidadaoProject/settings.py
