@@ -18,7 +18,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
 # Em produção, definir DEBUG como False
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mapacidadao.onrender.com']
 
 
 # Application definition
