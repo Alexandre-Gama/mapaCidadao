@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+# Byte-compiled
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,23 +13,11 @@ db.sqlite3
 db.sqlite3-journal
 media
 
-# Virtual Environment
+# Ambiente Virtual
 venv/
-env/
-ENV/
-mapacidadao_env/
-
-# IDE specific files
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Collected static files
-staticfiles/
 
 # Anexos
 anexos/
 
-# Django Settings
+# Configurações do Projeto Django
 MapaCidadaoProject/settings.py
