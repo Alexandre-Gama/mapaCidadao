@@ -17,7 +17,7 @@ media
 venv/
 
 # Anexos
-anexos/
+media/
 
 # Configurações do Projeto Django
 MapaCidadaoProject/settings.py
