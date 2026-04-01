@@ -8,7 +8,7 @@ def pagina_inicial(request):
     # Buscar algumas estatísticas básicas para exibir na página inicial
     total_denuncias = Denuncia.objects.count()
     tipos_problema = TipoProblema.objects.all()
-    return render(request, 'app/pagina_inicial.html', {
+    return render(request, 'AppFormularioDeDenuncias/index.html', {
         'total_denuncias': total_denuncias,
         'tipos_problema': tipos_problema
     })
@@ -37,7 +37,7 @@ def formulario_denuncia(request):
         form = DenunciaForm()
         formset = AnexoFormSet()
     
-    return render(request, 'app/app_formulariodedenuncias.html', {
+    return render(request, 'AppFormularioDeDenuncias/app.html', {
         'form': form,
         'formset': formset,
         'tipos_problema': tipos_problema,

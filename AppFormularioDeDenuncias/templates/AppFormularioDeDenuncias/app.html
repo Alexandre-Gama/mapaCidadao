@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registrar Denúncia - Mapa Cidadão{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <h2 class="mb-4">Registrar Nova Denúncia</h2>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="id_descricao" class="form-label">Descrição do problema</label>
+                {{ form.descricao }}
+                <div class="form-text">Descreva o problema encontrado de forma clara e objetiva.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="id_tipo_problema" class="form-label">Tipo de Problema</label>
+                {{ form.tipo_problema }}
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Localização</label>
+                <div class="d-grid gap-2 mb-2">
+                    <button type="button" id="btn-usar-minha-localizacao" class="btn btn-secondary">
+                        <i class="fas fa-location-arrow"></i> Usar minha localização atual
+                    </button>
+                </div>
+                <div id="map" style="height: 400px;" class="border rounded"></div>
+                <div class="form-text mt-2">Clique no mapa para ajustar a localização exata do problema ou use o botão acima para usar sua localização atual.</div>
+                {{ form.latitude }}
+                {{ form.longitude }}
+            </div>
+            
+            <div class="mb-4">
+                <h5>Anexo</h5>
+                <div class="form-text mb-2">Adicione uma foto ou documento que evidencie o problema relatado.</div>
+                {{ formset.management_form }}
+                <div id="anexos-container">
+                    {% for anexo_form in formset %}
+                        <div class="anexo-item mb-2">
+                            {{ anexo_form.arquivo }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Enviar Denúncia</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'AppFormularioDeDenuncias/js/app.js' %}"></script>
+{% endblock %}

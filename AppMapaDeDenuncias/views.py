@@ -8,7 +8,7 @@ import json
 
 def mapa_denuncias(request):
     tipos_problema = TipoProblema.objects.all()
-    return render(request, 'app/app_mapadedenuncias.html', {
+    return render(request, 'AppMapaDeDenuncias/app.html', {
         'tipos_problema': tipos_problema
     })
 
@@ -62,7 +62,7 @@ def detalhe_denuncia(request, denuncia_id):
     estatistica.visualizacoes += 1
     estatistica.save()
     
-    return render(request, 'app/detalhe_denuncia.html', {
+    return render(request, 'AppMapaDeDenuncias/detalhe_denuncia.html', {
         'denuncia': denuncia,
         'anexos': anexos,
         'estatistica': estatistica,

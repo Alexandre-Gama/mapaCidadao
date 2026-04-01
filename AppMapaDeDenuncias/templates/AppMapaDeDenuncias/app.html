@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mapa de Denúncias - Mapa Cidadão{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'AppMapaDeDenuncias/css/app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">Filtros</div>
+            <div class="card-body">
+                <form id="filtro-form">
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Problema</label>
+                        <select id="filtro-tipo" class="form-select">
+                            <option value="">Todos</option>
+                            {% for tipo in tipos_problema %}
+                                <option value="{{ tipo.id }}">{{ tipo.descricao }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data Início</label>
+                        <input type="date" id="filtro-data-inicio" class="form-control">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" id="filtro-data-fim" class="form-control">
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">Estatísticas</div>
+            <div class="card-body">
+                <p><strong>Total de denúncias:</strong> <span id="total-denuncias">0</span></p>
+                <p><strong>Visualizando:</strong> <span id="visualizando-denuncias">0</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <h2 class="mb-3">Mapa de Denúncias</h2>
+        <div id="mapa-denuncias" style="height: 600px;" class="border rounded"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="detalheModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes da Denúncia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalhe-conteudo">
+                <!-- Conteúdo preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'AppMapaDeDenuncias/js/app.js' %}"></script>
+{% endblock %}
