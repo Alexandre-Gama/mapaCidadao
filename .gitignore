@@ -19,8 +19,5 @@ venv/
 # Anexos
 anexos/
 
-# Configurações do Projeto Django
-MapaCidadaoProject/settings.py
-
 # Variáveis de ambiente
 .env
