@@ -26,9 +26,9 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-**Windows (PowerShell):**
-```powershell
-.\setup.ps1
+**Windows:**
+```bat
+setup.bat
 ```
 
 > O script cria o `.env` a partir do `.env.example`, substituindo as credenciais por valores gerados automaticamente. Caso queira ajustar outras variáveis (como `DJANGO_ALLOWED_HOSTS`), edite o `.env` gerado antes de continuar.
